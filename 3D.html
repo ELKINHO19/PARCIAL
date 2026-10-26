@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#111d2a">
+    <title>3D Project: Bosque Invernal</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        body {
+            min-height: 100vh;
+            overflow: hidden;
+            background: #111d2a;
+        }
+
+        .game-navbar {
+            height: 64px;
+        }
+
+        .game-stage {
+            position: relative;
+            height: calc(100vh - 64px);
+            min-height: 400px;
+            overflow: hidden;
+            background: #b9d0dc;
+        }
+
+        #game-canvas {
+            position: absolute;
+            inset: 0;
+            z-index: 0;
+            width: 100%;
+            height: 100%;
+            display: block;
+            outline: none;
+        }
+
+        .game-hud {
+            position: absolute;
+            inset: 18px 20px auto;
+            z-index: 1;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 12px;
+            color: #fff;
+            pointer-events: none;
+            text-shadow: 0 2px 8px #10202dbb;
+        }
+
+        .hud-panel {
+            padding: 10px 14px;
+            border: 1px solid #ffffff45;
+            border-radius: 10px;
+            background: #10202d99;
+            backdrop-filter: blur(8px);
+        }
+
+        .hud-title {
+            margin: 0;
+            color: #fff;
+            font: 700 1rem 'Rajdhani', sans-serif;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .hud-count {
+            color: #d8f3ff;
+            font: 700 1.1rem 'Rajdhani', sans-serif;
+        }
+
+        .game-crosshair {
+            position: absolute;
+            z-index: 1;
+            top: 50%;
+            left: 50%;
+            width: 16px;
+            height: 16px;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+        }
+
+        .game-crosshair::before,
+        .game-crosshair::after {
+            content: "";
+            position: absolute;
+            left: 7px;
+            top: 1px;
+            width: 2px;
+            height: 14px;
+            background: #fff;
+            box-shadow: 0 0 4px #14202a;
+        }
+
+        .game-crosshair::after {
+            transform: rotate(90deg);
+        }
+
+        #grapple-hud {
+            position: absolute;
+            z-index: 2;
+            left: 50%;
+            top: 62%;
+            display: none;
+            min-width: 240px;
+            transform: translate(-50%, -50%);
+            color: #fff;
+            text-align: center;
+            pointer-events: none;
+        }
+
+        #grapple-hud.is-active {
+            display: grid;
+            gap: 5px;
+            border-color: #ff967b;
+            background: #321c22e8;
+        }
+
+        .grapple-track {
+            height: 10px;
+            overflow: hidden;
+            border: 1px solid #ffffff88;
+            border-radius: 99px;
+            background: #111923;
+        }
+
+        #grapple-progress {
+            display: block;
+            width: 0;
+            height: 100%;
+            background: linear-gradient(90deg, #ff705c, #ffd070);
+            transition: width 80ms linear;
+        }
+
+        .game-overlay {
+            position: absolute;
+            inset: 0;
+            z-index: 2;
+            display: grid;
+            place-items: center;
+            padding: 20px;
+            background: #101b27a8;
+            backdrop-filter: blur(4px);
+            transition: opacity 180ms ease;
+        }
+
+        .game-overlay.is-hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .game-dialog {
+            width: min(100%, 510px);
+            padding: clamp(24px, 5vw, 42px);
+            border: 1px solid #c7e7f366;
+            border-radius: 18px;
+            background: #132333ed;
+            box-shadow: 0 24px 80px #07111bcc;
+            text-align: center;
+        }
+
+        .game-dialog h1 {
+            margin: 12px 0;
+            font-size: clamp(2rem, 7vw, 3rem);
+            text-transform: uppercase;
+        }
+
+        .game-dialog p {
+            color: #c5d4df;
+        }
+
+        .game-hint {
+            margin: 18px 0 22px;
+            color: #b3c5d3;
+            font-size: .9rem;
+            line-height: 1.8;
+        }
+
+        .game-error {
+            margin: 14px 0 0;
+            color: #ffd3cf;
+            font-size: .85rem;
+        }
+
+        .game-footer {
+            position: absolute;
+            z-index: 1;
+            right: 18px;
+            bottom: 12px;
+            color: #fff;
+            font-size: .78rem;
+            text-shadow: 0 1px 5px #10202d;
+            pointer-events: none;
+        }
+
+        @media (max-width: 575px) {
+            .game-navbar .navbar-brand {
+                font-size: 1.05rem;
+            }
+
+            .game-hud {
+                inset: 10px 10px auto;
+            }
+
+            .hud-panel {
+                padding: 8px 10px;
+            }
+
+            .game-footer {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand game-navbar navbar-dark">
+        <div class="container-fluid px-3 px-md-4">
+            <a class="navbar-brand" href="index.html">MMA SCOUTING <span class="text-accent">UFC</span></a>
+            <ul class="navbar-nav ms-auto flex-row align-items-center gap-3">
+                <li class="nav-item"><a class="nav-link" href="index.html">Volver al panel</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main class="game-stage" aria-label="Juego FPS en primera persona: Bosque Invernal">
+        <canvas id="game-canvas" aria-label="Vista del bosque. Haz clic para iniciar."></canvas>
+        <div class="game-hud" aria-live="polite">
+            <div class="hud-panel">
+                <p class="hud-title">Bosque invernal</p>
+                <div class="hud-count">Oleada <span id="wave-count">1</span> · Eliminados: <span id="kill-count">0</span></div>
+                <div class="hud-count">Vida: <span id="health-count">20</span>/20</div>
+            </div>
+            <div class="hud-panel hud-count">
+                <div>Yetis: <span id="enemy-count">0</span></div>
+                <div>Arma: <span id="weapon-name">Mano-pistola</span></div>
+                <div id="ammo-display">Munición: <span id="ammo-count">--</span></div>
+                <div>Granadas: <span id="grenade-count">0</span></div>
+            </div>
+        </div>
+        <div class="game-crosshair" aria-hidden="true"></div>
+        <div id="grapple-hud" class="hud-panel" aria-live="assertive">
+            <strong>¡TE TIENE AGARRADO!</strong>
+            <span>¡Haz clic repetidamente para liberarte!</span>
+            <div class="grapple-track"><span id="grapple-progress"></span></div>
+            <span id="grapple-count">0 / 10</span>
+        </div>
+
+        <section class="game-overlay" id="game-overlay">
+            <div class="game-dialog">
+                <span class="badge badge-accent" id="overlay-badge">Supervivencia · Oleada 1</span>
+                <h1 id="overlay-title">Bosque <span class="text-accent">invernal</span></h1>
+                <p id="overlay-description">Sobrevive en primera persona. La cámara pasará a tercera persona al morir.</p>
+                <div class="game-hint">W A S D moverte · Espacio saltar · Ratón mirar<br>Clic izq. atacar/disparar · Clic der. apuntar · 1/2/3 arma · R recargar · G granada · P bailar/cancelar</div>
+                <button class="btn btn-accent btn-lg" id="start-button" type="button">Entrar al bosque</button>
+                <p class="game-error" id="game-error" role="status" hidden></p>
+            </div>
+        </section>
+        <div class="game-footer">WASD mover · Espacio saltar · 1/2/3 arma · R recargar · G granada · P bailar</div>
+    </main>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script type="module" src="js/winter-game.js"></script>
+</body>
+</html>

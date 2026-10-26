@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+    <title>Reportar Peleador - MMA Scouting UFC</title>
+</head>
+<body>
+
+    <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="index.html">MMA SCOUTING <span class="text-accent">UFC</span></a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="mainNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="index.html">Panel Principal</a></li>
+                    <li class="nav-item"><a class="nav-link" href="blog.html">Lista de Prospectos</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="contacto.html">Reportar Peleador</a></li>
+                    <li class="nav-item"><a class="nav-link" href="postproduccion.html">Post-Producción</a></li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Juegos</a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="futbol.html">Leyendas del Balón</a></li>
+                            <li><a class="dropdown-item" href="vuelo.html">Cielo en Ruinas</a></li>
+                            <li><a class="dropdown-item" href="3D.html">3D Project</a></li>
+                            <li><a class="dropdown-item" href="testing.html">PONG!</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="index.html">Volver al menú</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        <section class="py-5">
+            <div class="container">
+                <div class="row justify-content-center">
+                    <div class="col-lg-8">
+
+                        <h1 class="section-title mb-2">Reportar / Sugerir Peleador</h1>
+                        <p class="text-secondary mb-4">Envía los datos de un prospecto o veterano para evaluarlo e incluirlo en la base de datos de seguimiento.</p>
+
+                        <div class="card form-card">
+                            <div class="card-body p-4 p-md-5">
+
+                                <form method="GET">
+
+                                    <!-- Nombre -->
+                                    <div class="mb-3">
+                                        <label for="nombre" class="form-label">Nombre del Peleador / Apodo:</label>
+                                        <input type="text" id="nombre" name="nombre" class="form-control" placeholder="Ej: Javier Balladares" required>
+                                    </div>
+
+                                    <!-- Categoría / Edad -->
+                                    <div class="row g-3">
+                                        <div class="col-md-6 mb-3">
+                                            <label for="categoria" class="form-label">Categoría de Peso:</label>
+                                            <select id="categoria" name="categoria" class="form-select" required>
+                                                <option value="" selected disabled>Selecciona una categoría...</option>
+                                                <option value="flyweight">Peso Mosca (125 lbs)</option>
+                                                <option value="bantamweight">Peso Gallo (135 lbs)</option>
+                                                <option value="featherweight">Peso Pluma (145 lbs)</option>
+                                                <option value="lightweight">Peso Ligero (155 lbs)</option>
+                                                <option value="welterweight">Peso Wélter (170 lbs)</option>
+                                                <option value="middleweight">Peso Mediano (185 lbs)</option>
+                                                <option value="lightheavyweight">Peso Semipesado (205 lbs)</option>
+                                                <option value="heavyweight">Peso Pesado (265 lbs)</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label for="edad" class="form-label">Edad:</label>
+                                            <input type="text" id="edad" name="edad" class="form-control" placeholder="Ej: 25">
+                                        </div>
+                                    </div>
+
+                                    <!-- Nivel de Competencia / País -->
+                                    <div class="row g-3">
+                                        <div class="col-md-6 mb-3">
+                                            <label for="nivel" class="form-label">Nivel de Competencia:</label>
+                                            <select id="nivel" name="nivel" class="form-select">
+                                                <option value="" selected disabled>Selecciona un nivel...</option>
+                                                <option value="amateur">Amateur</option>
+                                                <option value="regional">Regional Profesional</option>
+                                                <option value="liga_mayor">Liga Mayor (PFL, ONE CHAMPIONSHIP, KSW, ETC.)</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label for="pais" class="form-label">País:</label>
+                                            <input type="text" id="pais" name="pais" class="form-control" placeholder="Ej: Chile">
+                                        </div>
+                                    </div>
+
+                                    <!-- Récord / Tapology -->
+                                    <div class="row g-3">
+                                        <div class="col-md-6 mb-3">
+                                            <label for="record" class="form-label">Récord Profesional (V-D-E):</label>
+                                            <input type="text" id="record" name="record" class="form-control" placeholder="Ej: 8-1-0" required>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label for="tapology" class="form-label">Enlace de Tapology:</label>
+                                            <input type="url" id="tapology" name="tapology" class="form-control" placeholder="https://www.tapology.com/fightcenter/fighters/..." required>
+                                        </div>
+                                    </div>
+
+                                    <!-- Motivo -->
+                                    <div class="mb-3">
+                                        <label for="motivo" class="form-label">Notas de Evaluación / Motivo de Reporte:</label>
+                                        <textarea id="motivo" name="motivo" rows="4" class="form-control" placeholder="Indica por qué debe ser evaluado (ej: racha de victorias, ex-UFC, especialista en grappling, etc.)" required></textarea>
+                                    </div>
+
+                                    <!-- Experiencia (Radio Buttons) -->
+                                    <div class="mb-3">
+                                        <label class="form-label d-block">Experiencia previa:</label>
+
+                                        <div class="form-check form-check-inline">
+                                            <input type="radio" id="expDebutante" name="experiencia" value="debutante" class="form-check-input" checked>
+                                            <label for="expDebutante" class="form-check-label">Prospecto / Debutante</label>
+                                        </div>
+
+                                        <div class="form-check form-check-inline">
+                                            <input type="radio" id="expUfc" name="experiencia" value="ufc" class="form-check-input">
+                                            <label for="expUfc" class="form-check-label">Ex-UFC / Veterano</label>
+                                        </div>
+                                    </div>
+
+                                    <!-- Confirmación Checkbox -->
+                                    <div class="mb-4 form-check">
+                                        <input type="checkbox" id="confirmacion" name="confirmacion" class="form-check-input" required>
+                                        <label for="confirmacion" class="form-check-label">Confirmo que la información proporcionada es verídica y relevante para la evaluación del peleador.</label>
+                                    </div>
+
+                                    <button type="submit" class="btn btn-primary btn-lg w-100">Enviar Reporte</button>
+
+                                </form>
+
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <div class="container text-center py-4">
+            <p class="mb-0">&copy; 2026 MMA Scouting UFC</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

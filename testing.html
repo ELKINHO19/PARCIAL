@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+    <title>Pong - MMA Scouting UFC</title>
+</head>
+<body class="pong-page">
+
+    <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="index.html">MMA SCOUTING <span class="text-accent">UFC</span></a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="mainNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="index.html">Panel Principal</a></li>
+                    <li class="nav-item"><a class="nav-link" href="blog.html">Lista de Prospectos</a></li>
+                    <li class="nav-item"><a class="nav-link" href="contacto.html">Reportar Peleador</a></li>
+                    <li class="nav-item"><a class="nav-link" href="postproduccion.html">Post-Producción</a></li>
+                    <li class="nav-item"><a class="nav-link" href="index.html">Volver al panel</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <header class="hero-banner">
+        <div class="container text-center py-5">
+            <span class="badge badge-accent mb-3">Juego clásico</span>
+            <h1 class="hero-title">PONG</h1>
+            <p class="hero-subtitle">Espacio interno para probar componentes y mini-herramientas fuera del flujo de scouting. Primer experimento: un Pong clásico.</p>
+        </div>
+    </header>
+
+    <main class="pong-main">
+        <section class="pong-section py-5">
+            <div class="container">
+                <h2 class="section-title mb-2">Pong <span class="text-accent">— Prueba de Canvas</span></h2>
+                <p class="text-secondary mb-4">Controla tu raqueta (derecha) moviendo el <strong>mouse</strong> arriba/abajo sobre el tablero. La raqueta izquierda es la <strong>IA</strong>: sigue la pelota casi a la perfección y casi nunca falla. Marcador infinito y la pelota se acelera con cada rebote. De vez en cuando, sin avisar, el juego se vuelve caótico por unos segundos. Si le empiezas a ganar por mucho a la IA, cuidado con la bola gris.</p>
+
+                <div class="row justify-content-center">
+                    <div class="col-lg-9">
+                        <div class="card form-card">
+                            <div class="card-body p-3 p-md-4">
+                                <div class="d-flex justify-content-center align-items-center gap-4 mb-3">
+                                    <div class="text-center">
+                                        <div class="stat-number" id="marcadorJugador">0</div>
+                                        <div class="stat-label">Jugador</div>
+                                    </div>
+                                    <div class="text-accent" style="font-family:'Rajdhani',sans-serif;font-weight:700;font-size:1.5rem;">VS</div>
+                                    <div class="text-center">
+                                        <div class="stat-number stat-danger" id="marcadorIA">0</div>
+                                        <div class="stat-label">IA</div>
+                                    </div>
+                                </div>
+                                <div class="game-frame">
+                                    <canvas width="750" height="585" id="game"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <div class="container text-center py-4">
+            <p class="mb-0">&copy; 2026 MMA Scouting UFC</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+    const canvas = document.getElementById('game');
+    const context = canvas.getContext('2d');
+    const grid = 15;
+
+    const paddleHeightNormal = grid * 5; // 80, tamaño normal de las paletas
+    const paddleHeightCaos = 42;         // tamaño reducido durante el evento aleatorio
+
+    function limitarPaddleY(paleta) {
+      const max = canvas.height - grid - paleta.height;
+      if (paleta.y < grid) {
+        paleta.y = grid;
+      } else if (paleta.y > max) {
+        paleta.y = max;
+      }
+    }
+
+    const velocidadBolaBase = 5;
+    const velocidadBolaMaxima = 16;
+    const incrementoPorRebote = 1.06; // +6% de velocidad por cada rebote
+    var velocidadIA = 6;
+
+    // Marcador infinito
+    let puntajeJugador = 0;
+    let puntajeIA = 0;
+    const elMarcadorJugador = document.getElementById('marcadorJugador');
+    const elMarcadorIA = document.getElementById('marcadorIA');
+
+    function actualizarMarcador() {
+      elMarcadorJugador.textContent = puntajeJugador;
+      elMarcadorIA.textContent = puntajeIA;
+    }
+
+    // Umbral de ventaja a partir del cual la IA "manda" una bola gris de penalización
+    const UMBRAL_VENTAJA_JUGADOR = 2;
+    let bolaGris = null;
+    let proximoLanzamientoGrisPermitido = 0;
+
+    // Cada cuánto (y cuánto tiempo) la IA pierde la concentración — MUY poco frecuente
+    var iaDistraida = false;
+
+    // Raqueta del jugador (derecha) — siempre una sola, controlada con el mouse
+    const rightPaddle = {
+      x: canvas.width - grid * 3,
+      y: canvas.height / 2 - paddleHeightNormal / 2,
+      width: grid,
+      height: paddleHeightNormal
+    };
+
+    // Paletas de la IA (izquierda). Normalmente solo hay una; durante el evento de
+    // caos se clonan para poder seguir varias bolas a la vez.
+    let contadorIdBola = 0;
+    function crearBola(x, y, dx, dy, principal) {
+      contadorIdBola++;
+      return {
+        id: contadorIdBola,
+        x: x, y: y, width: grid, height: grid,
+        dx: dx, dy: dy,
+        resetting: false,
+        principal: !!principal
+      };
+    }
+
+    const bolaPrincipal = crearBola(canvas.width / 2, canvas.height / 2, velocidadBolaBase, -velocidadBolaBase, true);
+    let bolas = [bolaPrincipal];
+
+    let paletasIA = [{
+      x: grid * 2,
+      y: canvas.height / 2 - paddleHeightNormal / 2,
+      width: grid,
+      height: paddleHeightNormal,
+      bolaObjetivo: bolaPrincipal.id,
+      esPrincipal: true
+    }];
+
+    // Comprueba si hay colisión entre dos objetos usando un cuadro delimitador alineado con los ejes (AABB).
+    // @ver https://developer.mozilla.org/en-US/docs/Games/Techniques/2D_collision_detection
+    function colisiona(obj1, obj2) {
+      return obj1.x < obj2.x + obj2.width &&
+             obj1.x + obj1.width > obj2.x &&
+             obj1.y < obj2.y + obj2.height &&
+             obj1.y + obj1.height > obj2.y;
+    }
+
+    // Aumenta la velocidad de una bola en cada rebote (con tope máximo)
+    function acelerarBola(b) {
+      b.dx *= incrementoPorRebote;
+      b.dy *= incrementoPorRebote;
+      const velocidad = Math.hypot(b.dx, b.dy);
+      if (velocidad > velocidadBolaMaxima) {
+        const escala = velocidadBolaMaxima / velocidad;
+        b.dx *= escala;
+        b.dy *= escala;
+      }
+    }
+
+    // Saca la bola principal desde el centro hacia uno u otro lado, con ángulo aleatorio
+    function sacarBolaPrincipal(haciaJugador) {
+      bolaPrincipal.x = canvas.width / 2;
+      bolaPrincipal.y = canvas.height / 2;
+      const velocidadActual = Math.max(Math.hypot(bolaPrincipal.dx, bolaPrincipal.dy), velocidadBolaBase);
+      const anguloMax = Math.PI / 4; // 45 grados
+      const angulo = (Math.random() * 2 - 1) * anguloMax;
+      const direccion = haciaJugador ? 1 : -1;
+      bolaPrincipal.dx = Math.cos(angulo) * velocidadActual * direccion;
+      bolaPrincipal.dy = Math.sin(angulo) * velocidadActual;
+    }
+
+    // Mueve cada paleta de la IA hacia la bola que tiene asignada, salvo cuando está "distraída"
+    function moverIA() {
+      if (iaDistraida) {
+        return;
+      }
+      paletasIA.forEach(function(paleta) {
+        let objetivo = bolas.find(function(b) { return b.id === paleta.bolaObjetivo; });
+        if (!objetivo) {
+          objetivo = bolaPrincipal;
+        }
+        const centroPaleta = paleta.y + paleta.height / 2;
+        if (centroPaleta < objetivo.y - grid / 2) {
+          paleta.y += velocidadIA;
+        } else if (centroPaleta > objetivo.y + grid / 2) {
+          paleta.y -= velocidadIA;
+        }
+      });
+    }
+
+    // Programa el próximo "lapso de concentración" de la IA — un error MUY inusual
+    function programarDistraccionIA() {
+      const proximaDistraccion = 25000 + Math.random() * 25000; // entre 25s y 50s
+      setTimeout(() => {
+        iaDistraida = true;
+        const duracionDistraccion = 150 + Math.random() * 250; // entre 0.15s y 0.4s
+        setTimeout(() => {
+          iaDistraida = false;
+          programarDistraccionIA();
+        }, duracionDistraccion);
+      }, proximaDistraccion);
+    }
+
+    // ------------------------------------------------------------------
+    // Evento aleatorio y silencioso: las paletas se encogen y la IA se
+    // multiplica para seguir varias bolas a la vez. No hay aviso ni pausa;
+    // simplemente ocurre, y al terminar todo vuelve a la normalidad.
+    // ------------------------------------------------------------------
+    let eventoCaosActivo = false;
+    let temporizadorFinCaos = null;
+
+    function programarProximoEventoCaos() {
+      const espera = 14000 + Math.random() * 20000; // entre 14s y 34s
+      setTimeout(iniciarEventoCaos, espera);
+    }
+
+    function iniciarEventoCaos() {
+      if (eventoCaosActivo) {
+        programarProximoEventoCaos();
+        return;
+      }
+      eventoCaosActivo = true;
+
+      // encoger la paleta del jugador y la paleta principal de la IA
+      rightPaddle.height = paddleHeightCaos;
+      paletasIA[0].height = paddleHeightCaos;
+      limitarPaddleY(rightPaddle);
+      limitarPaddleY(paletasIA[0]);
+
+      // añadir bolas y paletas de IA extra
+      const extras = 1 + Math.floor(Math.random() * 2); // 1 o 2 bolas extra
+      for (let i = 0; i < extras; i++) {
+        const anguloAleatorio = (Math.random() * 2 - 1) * (Math.PI / 3);
+        const direccion = Math.random() > 0.5 ? 1 : -1;
+        const nuevaBola = crearBola(
+          canvas.width / 2,
+          canvas.height / 2,
+          Math.cos(anguloAleatorio) * velocidadBolaBase * direccion,
+          Math.sin(anguloAleatorio) * velocidadBolaBase,
+          false
+        );
+        bolas.push(nuevaBola);
+
+        const yAleatoria = grid + Math.random() * (canvas.height - 2 * grid - paddleHeightCaos);
+        paletasIA.push({
+          x: grid * 2,
+          y: yAleatoria,
+          width: grid,
+          height: paddleHeightCaos,
+          bolaObjetivo: nuevaBola.id,
+          esPrincipal: false
+        });
+      }
+
+      temporizadorFinCaos = setTimeout(finalizarEventoCaos, 7000 + Math.random() * 5000);
+    }
+
+    function finalizarEventoCaos() {
+      if (!eventoCaosActivo) {
+        return;
+      }
+      eventoCaosActivo = false;
+
+      if (temporizadorFinCaos) {
+        clearTimeout(temporizadorFinCaos);
+        temporizadorFinCaos = null;
+      }
+
+      // quitar las bolas y paletas extra; solo queda la principal de cada lado
+      bolas = bolas.filter(function(b) { return b.principal; });
+      paletasIA = paletasIA.filter(function(p) { return p.esPrincipal; });
+
+      // restaurar tamaños normales
+      rightPaddle.height = paddleHeightNormal;
+      paletasIA[0].height = paddleHeightNormal;
+      limitarPaddleY(rightPaddle);
+      limitarPaddleY(paletasIA[0]);
+
+      programarProximoEventoCaos();
+    }
+
+    // Lanza, si corresponde, una bola gris que penaliza al jugador cuando va ganando por mucho
+    function intentarLanzarBolaGris() {
+      if (bolaGris) {
+        return;
+      }
+      if (puntajeJugador - puntajeIA < UMBRAL_VENTAJA_JUGADOR) {
+        return;
+      }
+      if (Date.now() < proximoLanzamientoGrisPermitido) {
+        return;
+      }
+      bolaGris = {
+        x: canvas.width / 2,
+        y: canvas.height / 2,
+        width: grid,
+        height: grid,
+        dx: velocidadBolaBase * 1.4,
+        dy: (Math.random() * 2 - 1) * velocidadBolaBase * 0.7
+      };
+      proximoLanzamientoGrisPermitido = Date.now() + 15000;
+    }
+
+    function actualizarBolaGris() {
+      if (!bolaGris) {
+        return;
+      }
+      bolaGris.x += bolaGris.dx;
+      bolaGris.y += bolaGris.dy;
+
+      if (bolaGris.y < grid || bolaGris.y + grid > canvas.height - grid) {
+        bolaGris.dy *= -1;
+      }
+
+      // Llega al lado del jugador: le quita un punto a él y se lo da a la IA
+      if (bolaGris.x > canvas.width) {
+        puntajeJugador = Math.max(0, puntajeJugador - 1);
+        puntajeIA += 1;
+        actualizarMarcador();
+        bolaGris = null;
+      }
+    }
+
+    // bucle del juego
+    function bucle() {
+      requestAnimationFrame(bucle);
+      context.clearRect(0, 0, canvas.width, canvas.height);
+
+      // la IA sigue sus bolas asignadas (con lapsos de distracción muy poco frecuentes)
+      moverIA();
+
+      bolas.forEach(function(b) {
+        // mover la bola según su velocidad
+        b.x += b.dx;
+        b.y += b.dy;
+
+        // Evita que la pelota atraviese las paredes cambiando su velocidad (y la acelera)
+        if (b.y < grid) {
+          b.y = grid;
+          b.dy *= -1;
+          acelerarBola(b);
+        } else if (b.y + grid > canvas.height - grid) {
+          b.y = canvas.height - grid * 2;
+          b.dy *= -1;
+          acelerarBola(b);
+        }
+
+        // Comprueba choque contra la paleta del jugador o contra cualquier paleta de la IA
+        if (colisiona(b, rightPaddle)) {
+          b.dx *= -1;
+          b.x = rightPaddle.x - b.width;
+          acelerarBola(b);
+        } else {
+          for (let k = 0; k < paletasIA.length; k++) {
+            if (colisiona(b, paletasIA[k])) {
+              b.dx *= -1;
+              b.x = paletasIA[k].x + paletasIA[k].width;
+              acelerarBola(b);
+              break;
+            }
+          }
+        }
+      });
+
+      // Reiniciar / eliminar bolas que pasaron de largo (solo si no se ha contado ya)
+      for (let i = bolas.length - 1; i >= 0; i--) {
+        const b = bolas[i];
+        if ((b.x < 0 || b.x > canvas.width) && !b.resetting) {
+          b.resetting = true;
+
+          if (b.x < 0) {
+            puntajeJugador++;
+          } else {
+            puntajeIA++;
+          }
+          actualizarMarcador();
+
+          if (b.principal) {
+            // Dale un tiempo al jugador para recuperarse antes de volver a lanzar la pelota.
+            setTimeout(function() {
+              b.resetting = false;
+              sacarBolaPrincipal(b.x < 0);
+            }, 400);
+          } else {
+            // Las bolas extra del evento de caos no se reponen: desaparecen
+            setTimeout(function() {
+              bolas = bolas.filter(function(otra) { return otra.id !== b.id; });
+              paletasIA = paletasIA.filter(function(p) { return p.esPrincipal || p.bolaObjetivo !== b.id; });
+              // si ya no quedan bolas extra, el evento termina ahí mismo
+              if (eventoCaosActivo && bolas.every(function(otra) { return otra.principal; })) {
+                finalizarEventoCaos();
+              }
+            }, 400);
+          }
+        }
+      }
+
+      // Bola gris de penalización cuando el jugador va ganando por mucho
+      intentarLanzarBolaGris();
+      actualizarBolaGris();
+
+      // evitar que las paletas atraviesen las paredes
+      limitarPaddleY(rightPaddle);
+      paletasIA.forEach(limitarPaddleY);
+
+      // dibujar paletas
+      context.fillStyle = 'white';
+      context.fillRect(rightPaddle.x, rightPaddle.y, rightPaddle.width, rightPaddle.height);
+      paletasIA.forEach(function(paleta) {
+        context.fillRect(paleta.x, paleta.y, paleta.width, paleta.height);
+      });
+
+      // dibujar bolas
+      context.fillStyle = 'white';
+      bolas.forEach(function(b) {
+        context.fillRect(b.x, b.y, b.width, b.height);
+      });
+
+      // dibujar bola gris de penalización
+      if (bolaGris) {
+        context.fillStyle = '#9aa0a6';
+        context.fillRect(bolaGris.x, bolaGris.y, bolaGris.width, bolaGris.height);
+      }
+
+      // dibujar paredes
+      context.fillStyle = 'lightgrey';
+      context.fillRect(0, 0, canvas.width, grid);
+      context.fillRect(0, canvas.height - grid, canvas.width, canvas.height);
+
+      // dibuja una línea punteada en el medio
+      for (let i = grid; i < canvas.height - grid; i += grid * 2) {
+        context.fillRect(canvas.width / 2 - grid / 2, i, grid, grid);
+      }
+    }
+
+    // Controlar la raqueta del jugador (derecha) con la posición vertical del mouse
+    canvas.addEventListener('mousemove', function(e) {
+      const rect = canvas.getBoundingClientRect();
+      const escalaY = canvas.height / rect.height;
+      const mouseY = (e.clientY - rect.top) * escalaY;
+
+      let nuevaY = mouseY - rightPaddle.height / 2;
+      const maxPaddleY = canvas.height - grid - rightPaddle.height;
+      if (nuevaY < grid) {
+        nuevaY = grid;
+      } else if (nuevaY > maxPaddleY) {
+        nuevaY = maxPaddleY;
+      }
+      rightPaddle.y = nuevaY;
+    });
+
+    // Iniciar el juego
+    actualizarMarcador();
+    programarDistraccionIA();
+    programarProximoEventoCaos();
+    requestAnimationFrame(bucle);
+    </script>
+</body>
+</html>

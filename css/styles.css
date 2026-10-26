@@ -1,0 +1,566 @@
+/* ==========================================================================
+   MMA SCOUTING UFC — Dark / Cyber-Green Design System
+   ========================================================================== */
+
+:root {
+  --bg-body: #0b0e14;
+  --bg-elevated: #121721;
+  --bg-card: #181f2a;
+  --bg-card-alt: #1e2530;
+  --border-color: #263041;
+  --border-color-soft: #1d2531;
+
+  --accent: #39ff14;
+  --accent-strong: #00ff66;
+  --accent-dark: #12a34a;
+  --accent-glow: rgba(57, 255, 20, 0.45);
+
+  --text-primary: #ffffff;
+  --text-secondary: #a7b0bd;
+  --text-muted: #6b7684;
+
+  --danger: #ff4d5e;
+
+  --radius-lg: 16px;
+  --radius-md: 12px;
+  --radius-sm: 8px;
+
+  --shadow-card: 0 10px 30px rgba(0, 0, 0, 0.5);
+  --shadow-card-hover: 0 16px 40px rgba(0, 0, 0, 0.6);
+}
+
+/* ==========================================================================
+   Base
+   ========================================================================== */
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  background-color: var(--bg-body);
+  color: var(--text-primary);
+  font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  min-height: 100vh;
+}
+
+h1, h2, h3, h4, h5 {
+  font-family: 'Rajdhani', 'Inter', sans-serif;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  color: var(--text-primary);
+}
+
+a {
+  text-decoration: none;
+}
+
+p {
+  color: var(--text-secondary);
+}
+
+.text-secondary {
+  color: var(--text-secondary) !important;
+}
+
+.text-muted {
+  color: var(--text-muted) !important;
+}
+
+.text-accent {
+  color: var(--accent) !important;
+}
+
+.section-title {
+  text-transform: uppercase;
+  font-size: 1.6rem;
+  border-left: 4px solid var(--accent);
+  padding-left: 0.75rem;
+}
+
+/* ==========================================================================
+   Navbar
+   ========================================================================== */
+
+.navbar {
+  background-color: rgba(11, 14, 20, 0.92);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.navbar-brand {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 700;
+  font-size: 1.4rem;
+  letter-spacing: 1px;
+  color: var(--text-primary) !important;
+}
+
+.navbar-nav .nav-link {
+  color: var(--text-secondary) !important;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+  letter-spacing: 0.5px;
+  padding: 0.5rem 1rem !important;
+  white-space: nowrap;
+  transition: color 0.2s ease;
+}
+
+.navbar-nav .nav-link:hover,
+.navbar-nav .nav-link.active {
+  color: var(--accent) !important;
+}
+
+.navbar-toggler {
+  border-color: var(--border-color);
+}
+
+.navbar-toggler-icon {
+  filter: invert(1);
+}
+
+.navbar .dropdown-menu {
+  background-color: var(--bg-elevated);
+  border-color: var(--border-color);
+}
+
+.navbar .dropdown-item {
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
+.navbar .dropdown-item:hover,
+.navbar .dropdown-item:focus {
+  background-color: var(--bg-card);
+  color: var(--accent);
+}
+
+.navbar .dropdown-divider {
+  border-color: var(--border-color);
+}
+
+/* ==========================================================================
+   Hero Banner
+   ========================================================================== */
+
+.hero-banner {
+  background:
+    radial-gradient(circle at 20% 20%, rgba(57, 255, 20, 0.08), transparent 45%),
+    radial-gradient(circle at 80% 0%, rgba(0, 255, 102, 0.06), transparent 40%),
+    var(--bg-elevated);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.hero-title {
+  font-size: clamp(2.2rem, 5vw, 3.5rem);
+  text-transform: uppercase;
+  margin-bottom: 1rem;
+}
+
+.hero-subtitle {
+  font-size: 1.1rem;
+  max-width: 640px;
+  margin: 0 auto;
+  color: var(--text-secondary);
+}
+
+.badge-accent {
+  background-color: rgba(57, 255, 20, 0.12);
+  color: var(--accent);
+  border: 1px solid rgba(57, 255, 20, 0.4);
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  font-size: 0.72rem;
+  padding: 0.45em 0.9em;
+}
+
+/* ==========================================================================
+   Buttons
+   ========================================================================== */
+
+.btn-accent {
+  background-color: var(--accent);
+  border: 1px solid var(--accent);
+  color: #04140a;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  transition: box-shadow 0.2s ease, transform 0.2s ease, background-color 0.2s ease;
+}
+
+.btn-accent:hover,
+.btn-accent:focus {
+  background-color: var(--accent-strong);
+  border-color: var(--accent-strong);
+  color: #04140a;
+  box-shadow: 0 0 20px var(--accent-glow);
+  transform: translateY(-1px);
+}
+
+.btn-outline-accent {
+  background-color: transparent;
+  border: 1px solid var(--accent);
+  color: var(--accent);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  transition: all 0.2s ease;
+}
+
+.btn-outline-accent:hover,
+.btn-outline-accent:focus {
+  background-color: var(--accent);
+  color: #04140a;
+  box-shadow: 0 0 20px var(--accent-glow);
+}
+
+/* Bootstrap's default .btn-primary reused for the report form */
+.btn-primary {
+  background-color: var(--accent);
+  border-color: var(--accent);
+  color: #04140a;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.btn-primary:hover,
+.btn-primary:focus {
+  background-color: var(--accent-strong);
+  border-color: var(--accent-strong);
+  color: #04140a;
+  box-shadow: 0 0 20px var(--accent-glow);
+}
+
+/* ==========================================================================
+   Stat / KPI Cards (index.html)
+   ========================================================================== */
+
+.stat-card {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--accent);
+}
+
+.stat-number {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 2.75rem;
+  font-weight: 700;
+  color: var(--accent);
+  line-height: 1;
+}
+
+.stat-number.stat-danger {
+  color: var(--danger);
+}
+
+.stat-label {
+  margin-top: 0.5rem;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  font-size: 0.8rem;
+  letter-spacing: 0.5px;
+}
+
+/* ==========================================================================
+   Fighter Cards (blog.html)
+   ========================================================================== */
+
+.fighter-card {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-card);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.fighter-card:hover {
+  transform: translateY(-6px);
+  border-color: var(--accent);
+  box-shadow: var(--shadow-card-hover);
+}
+
+.fighter-card-header {
+  background: linear-gradient(135deg, var(--bg-card-alt), var(--bg-elevated));
+  padding: 1.25rem 1.25rem 3rem;
+  position: relative;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.fighter-avatar {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background-color: var(--bg-elevated);
+  border: 2px solid var(--accent);
+  color: var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  object-fit: cover;
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 700;
+  font-size: 1.5rem;
+  position: absolute;
+  bottom: -32px;
+  left: 1.25rem;
+  box-shadow: 0 0 16px var(--accent-glow);
+}
+
+.fighter-card .card-body {
+  padding-top: 2.5rem;
+}
+
+.fighter-name {
+  font-size: 1.2rem;
+  margin-bottom: 0.15rem;
+}
+
+.fighter-nickname {
+  color: var(--accent);
+}
+
+.fighter-record {
+  display: inline-block;
+  background-color: rgba(57, 255, 20, 0.12);
+  border: 1px solid rgba(57, 255, 20, 0.4);
+  color: var(--accent);
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 700;
+  font-size: 1.1rem;
+  letter-spacing: 1px;
+  padding: 0.25rem 0.75rem;
+  border-radius: var(--radius-sm);
+  margin-bottom: 1rem;
+}
+
+.fighter-stats {
+  margin-bottom: 1.25rem;
+}
+
+.fighter-stats li {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.4rem 0;
+  border-bottom: 1px dashed var(--border-color-soft);
+  font-size: 0.9rem;
+}
+
+.fighter-stats li span {
+  color: var(--text-muted);
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.5px;
+}
+
+.fighter-stats li strong {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+/* ==========================================================================
+   Dark Form Card (contacto.html)
+   ========================================================================== */
+
+.form-card {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+}
+
+.form-card .form-label {
+  color: var(--text-secondary);
+  font-weight: 600;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.form-card .form-control,
+.form-card .form-select {
+  background-color: var(--bg-elevated);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  border-radius: var(--radius-sm);
+}
+
+.form-card .form-control::placeholder {
+  color: var(--text-muted);
+}
+
+.form-card .form-control:focus,
+.form-card .form-select:focus {
+  background-color: var(--bg-elevated);
+  color: var(--text-primary);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 0.2rem var(--accent-glow);
+}
+
+.form-card .form-check-input {
+  background-color: var(--bg-elevated);
+  border: 1px solid var(--border-color);
+}
+
+.form-card .form-check-input:checked {
+  background-color: var(--accent);
+  border-color: var(--accent);
+}
+
+.form-card .form-check-input:focus {
+  box-shadow: 0 0 0 0.2rem var(--accent-glow);
+  border-color: var(--accent);
+}
+
+.form-card .form-check-label {
+  color: var(--text-secondary);
+}
+
+/* ==========================================================================
+   Video Frame (evidencias.html)
+   ========================================================================== */
+
+.video-frame {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background-color: var(--bg-elevated);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.video-frame video {
+  display: block;
+  border-radius: var(--radius-md);
+  object-fit: cover;
+}
+
+.video-frame-portrait {
+  aspect-ratio: 9 / 16;
+}
+
+/* ==========================================================================
+   Game Frame (testing.html)
+   ========================================================================== */
+
+.game-frame {
+  display: flex;
+  justify-content: center;
+  background-color: var(--bg-elevated);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 1rem;
+  overflow: auto;
+}
+
+.game-frame canvas {
+  display: block;
+  width: 100%;
+  max-width: 750px;
+  height: auto;
+  border-radius: var(--radius-sm);
+}
+
+.pong-page {
+  display: flex;
+  height: 100vh;
+  min-height: 0;
+  flex-direction: column;
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
+.pong-page > .navbar {
+  flex: 0 0 auto;
+}
+
+.pong-page > .hero-banner,
+.pong-page > .site-footer {
+  display: none;
+}
+
+.pong-main {
+  min-height: 0;
+  flex: 1 1 auto;
+  overflow: hidden;
+}
+
+.pong-section {
+  height: 100%;
+  padding: 0.75rem 0 !important;
+}
+
+.pong-section > .container {
+  display: flex;
+  height: 100%;
+  flex-direction: column;
+}
+
+.pong-section h1,
+.pong-section h2 {
+  flex: 0 0 auto;
+  margin-bottom: 0.35rem !important;
+  font-size: 1.35rem;
+}
+
+.pong-section > .container > p {
+  flex: 0 0 auto;
+  margin-bottom: 0.6rem !important;
+  font-size: 0.88rem;
+  line-height: 1.35;
+}
+
+.pong-section > .container > .row {
+  min-height: 0;
+  flex: 1 1 auto;
+}
+
+.pong-section > .container > .row > div,
+.pong-section .form-card {
+  height: 100%;
+}
+
+.pong-section .form-card .card-body {
+  display: flex;
+  min-height: 0;
+  flex-direction: column;
+}
+
+.pong-section .game-frame {
+  min-height: 0;
+  flex: 1 1 auto;
+  overflow: hidden;
+}
+
+.pong-section .game-frame canvas {
+  min-width: 0;
+  min-height: 0;
+  flex: 1 1 0;
+  align-self: stretch;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  max-height: none;
+  aspect-ratio: auto;
+}
+
+/* ==========================================================================
+   Footer
+   ========================================================================== */
+
+.site-footer {
+  background-color: var(--bg-elevated);
+  border-top: 1px solid var(--border-color);
+  color: var(--text-muted);
+}

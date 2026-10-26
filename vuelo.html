@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#111d2a">
+    <title>Cielo en Ruinas - MMA Scouting UFC</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        body {
+            min-height: 100vh;
+            overflow: hidden;
+            background: #111d2a;
+        }
+
+        .flight-navbar {
+            height: 64px;
+        }
+
+        .flight-navbar .text-accent {
+            color: #ffd27a !important;
+        }
+
+        .flight-stage {
+            position: relative;
+            height: calc(100vh - 64px);
+            min-height: 420px;
+            overflow: hidden;
+            background: #818a92;
+        }
+
+        #flight-canvas {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            display: block;
+            outline: none;
+        }
+
+        .flight-hud {
+            position: absolute;
+            inset: 16px 18px auto;
+            z-index: 1;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 12px;
+            color: #fff;
+            pointer-events: none;
+            text-shadow: 0 2px 8px #10202dbb;
+        }
+
+        .flight-panel {
+            display: grid;
+            gap: 3px;
+            min-width: 150px;
+            padding: 10px 14px;
+            border: 1px solid #ffffff45;
+            border-radius: 10px;
+            background: linear-gradient(145deg, #18232ee8, #101820d9);
+            backdrop-filter: blur(8px);
+            font: 700 1rem 'Rajdhani', sans-serif;
+        }
+
+        .flight-panel strong {
+            color: #d8f3ff;
+            font-size: 1.1rem;
+        }
+
+        .health-track {
+            height: 8px;
+            overflow: hidden;
+            border-radius: 999px;
+            background: #ffffff35;
+        }
+
+        .health-fill {
+            width: 100%;
+            height: 100%;
+            border-radius: inherit;
+            background: #ffbd62;
+            transition: width 0.2s ease, background-color 0.2s ease;
+        }
+
+        .flight-reticle {
+            position: absolute;
+            z-index: 1;
+            top: 41%;
+            left: 50%;
+            width: 28px;
+            height: 28px;
+            transform: translate(-50%, -50%);
+            border: 2px solid #ffd27a;
+            border-radius: 50%;
+            box-shadow: 0 0 10px #10202d, 0 0 18px #ffb84d66;
+            pointer-events: none;
+        }
+
+        .flight-reticle::before,
+        .flight-reticle::after {
+            content: "";
+            position: absolute;
+            background: #ffd27a;
+            box-shadow: 0 0 5px #10202d;
+        }
+
+        .flight-reticle::before {
+            top: 12px;
+            left: -5px;
+            width: 36px;
+            height: 2px;
+        }
+
+        .flight-reticle::after {
+            top: -5px;
+            left: 12px;
+            width: 2px;
+            height: 36px;
+        }
+
+        .flight-overlay {
+            position: absolute;
+            inset: 0;
+            z-index: 3;
+            display: grid;
+            place-items: center;
+            padding: 20px;
+            background: #07111ac2;
+            backdrop-filter: blur(5px);
+        }
+
+        .flight-overlay[hidden] {
+            display: none;
+        }
+
+        .flight-dialog {
+            width: min(540px, 100%);
+            padding: clamp(24px, 5vw, 42px);
+            border: 1px solid #ffffff30;
+            border-radius: 18px;
+            background: #121a25ed;
+            box-shadow: 0 24px 80px #0008;
+            text-align: center;
+        }
+
+        .flight-dialog h1 {
+            margin: 18px 0 8px;
+            font-size: clamp(2.2rem, 8vw, 3.5rem);
+            text-transform: uppercase;
+        }
+
+        .flight-dialog .text-accent {
+            color: #ffd27a !important;
+        }
+
+        .flight-dialog .badge-accent {
+            border-color: #ffd27a;
+            background: #4a3821;
+            color: #ffd27a;
+        }
+
+        .flight-dialog .btn-accent,
+        .flight-dialog .btn-accent:hover {
+            border-color: #ffd27a;
+            background: #ffd27a;
+            color: #18202a;
+        }
+
+        .flight-help {
+            margin: 22px 0;
+            color: #c2d0dd;
+            font-size: 0.92rem;
+            line-height: 1.8;
+        }
+
+        .flight-error {
+            margin: 14px 0 0;
+            color: #ff9eaa;
+        }
+
+        .flight-instruments {
+            position: absolute;
+            inset: auto 16px 16px;
+            z-index: 2;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            pointer-events: none;
+        }
+
+        .ammo-display {
+            width: min(220px, 42vw);
+            padding: 12px 15px;
+            border: 1px solid #ffffff55;
+            border-radius: 12px;
+            background: linear-gradient(145deg, #18232ee8, #101820d9);
+            color: #fff;
+            font: 700 1rem 'Rajdhani', sans-serif;
+            text-shadow: 0 2px 8px #10202dbb;
+        }
+
+        .ammo-heading {
+            display: flex;
+            justify-content: space-between;
+            gap: 8px;
+            margin-bottom: 7px;
+        }
+
+        .ammo-heading strong {
+            color: #ffd27a;
+        }
+
+        .ammo-track {
+            height: 8px;
+            overflow: hidden;
+            border-radius: 999px;
+            background: #ffffff35;
+        }
+
+        .ammo-fill {
+            width: 100%;
+            height: 100%;
+            border-radius: inherit;
+            background: #ffd27a;
+            transition: width 0.12s linear, background-color 0.2s ease;
+        }
+
+        .ammo-display.is-reloading .ammo-fill {
+            background: #ff695e;
+        }
+
+        .ammo-status {
+            display: block;
+            min-height: 1.2em;
+            margin-top: 5px;
+            color: #d8e1e8;
+            font-size: 0.82rem;
+        }
+
+        .flight-radar {
+            display: grid;
+            place-items: center;
+            width: 148px;
+            height: 148px;
+            overflow: hidden;
+            border: 2px solid #ffd27a99;
+            border-radius: 50%;
+            background: radial-gradient(circle, #132a2be8, #101820f2 72%);
+            box-shadow: 0 8px 24px #0006, inset 0 0 18px #64d7bf22;
+        }
+
+        #flight-radar {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+
+        @media (max-width: 600px) {
+            .flight-navbar .navbar-brand {
+                font-size: 1.1rem;
+            }
+
+            .flight-navbar .nav-item:last-child {
+                display: none;
+            }
+
+            .flight-hud {
+                inset: 10px 10px auto;
+            }
+
+            .flight-panel {
+                min-width: 120px;
+                padding: 8px 10px;
+                font-size: 0.9rem;
+            }
+
+            .flight-instruments {
+                inset: auto 10px 10px;
+            }
+
+            .flight-radar {
+                width: 132px;
+                height: 132px;
+            }
+
+            .ammo-display {
+                padding: 10px 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand flight-navbar navbar-dark">
+        <div class="container-fluid px-3 px-md-4">
+            <a class="navbar-brand" href="index.html">CIELO EN <span class="text-accent">RUINAS</span></a>
+            <ul class="navbar-nav ms-auto flex-row align-items-center gap-3">
+                <li class="nav-item"><a class="nav-link" href="index.html">Volver al panel</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main class="flight-stage" aria-label="Cielo en Ruinas: combate aéreo">
+        <canvas id="flight-canvas" aria-label="Escenario de vuelo en tercera persona"></canvas>
+
+        <div class="flight-hud" aria-live="polite">
+            <div class="flight-panel">
+                <span>AVIÓN <strong id="health-count">100</strong>%</span>
+                <div class="health-track"><div class="health-fill" id="health-fill"></div></div>
+                <span>VELOCIDAD <strong id="speed-count">0</strong> km/h</span>
+                <span>ALTURA <strong id="altitude-count">0</strong> m</span>
+            </div>
+            <div class="flight-panel">
+                <span>ENEMIGOS <strong id="enemy-count">0</strong></span>
+                <span>BAJAS <strong id="kill-count">0</strong></span>
+            </div>
+        </div>
+
+        <div class="flight-reticle" aria-hidden="true"></div>
+
+        <div class="flight-instruments">
+            <div class="ammo-display" id="ammo-display" role="status" aria-live="off">
+                <div class="ammo-heading">
+                    <span>MUNICIÓN</span>
+                    <strong><span id="ammo-count">100</span> / 100</strong>
+                </div>
+                <div class="ammo-track" aria-hidden="true">
+                    <div class="ammo-fill" id="ammo-fill"></div>
+                </div>
+                <span class="ammo-status" id="ammo-status">ESPACIO O CLIC PARA DISPARAR</span>
+            </div>
+            <div class="flight-radar" role="img" aria-label="Radar de enemigos cercanos">
+                <canvas id="flight-radar" width="296" height="296"></canvas>
+            </div>
+        </div>
+
+        <section class="flight-overlay" id="flight-overlay">
+            <div class="flight-dialog">
+                <span class="badge badge-accent" id="overlay-badge">Misión aérea · Sector abandonado</span>
+                <h1 id="overlay-title">Cielo en <span class="text-accent">ruinas</span></h1>
+                <p class="text-secondary" id="overlay-description">Sobrevuela la ciudad devastada, derriba los cazas hostiles y esquiva las torretas antiaéreas al volar bajo.</p>
+                <div class="flight-help">
+                    ↑ / W subir · ↓ / S bajar · ← / A y → / D virar<br>
+                    Espacio o clic disparar · Shift acelerar · Ctrl frenar<br>
+                    100 disparos · Recarga automática en 5 s · Torretas activas hasta 2000 m
+                </div>
+                <button class="btn btn-accent btn-lg" id="start-button" type="button">Iniciar vuelo</button>
+                <p class="flight-error" id="game-error" role="status" hidden></p>
+            </div>
+        </section>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script type="module" src="js/flight-game.js"></script>
+</body>
+</html>
