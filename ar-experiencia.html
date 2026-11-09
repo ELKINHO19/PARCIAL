@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0b0e14">
+    <title>Experiencia AR interactiva</title>
+    <link rel="stylesheet" href="css/ar-experiencia.css">
+    <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+</head>
+<body>
+    <main class="experience">
+        <a-scene embedded class="experience__scene" cursor="rayOrigin: mouse">
+            <a-entity light="type: ambient; intensity: 1.1"></a-entity>
+            <a-entity light="type: directional; intensity: 1.8" position="-2 4 3"></a-entity>
+            <a-plane rotation="-90 0 0" width="200" height="200" color="#111923"></a-plane>
+
+            <a-box id="objeto-producto"
+                   class="clickable"
+                   position="-1.7 1.2 -3"
+                   rotation="0 25 0"
+                   color="#2A75FF"
+                   material="roughness: 0.3; metalness: 0.35"
+                   shadow>
+                <a-text value="NEXUS" align="center" color="#ffffff" width="2.2"
+                        position="0 0 0.51"></a-text>
+            </a-box>
+
+            <a-camera position="0 1.6 0">
+                <a-cursor id="cursor-ar"
+                          color="#39ff14"
+                          fuse="false"
+                          raycaster="objects: .clickable"></a-cursor>
+            </a-camera>
+        </a-scene>
+
+        <header class="heading">
+            <a class="heading__back" href="ar-showroom.html">← Volver al showroom</a>
+            <p class="heading__eyebrow">Laboratorio interactivo</p>
+            <h1>Experiencia <span>AR</span></h1>
+            <p class="heading__hint">Haz clic o apunta al producto para cambiar su color.</p>
+        </header>
+
+        <section class="controls" aria-labelledby="controls-title">
+            <div class="controls__header">
+                <span class="controls__indicator" aria-hidden="true"></span>
+                <div>
+                    <p class="controls__eyebrow">Panel de control</p>
+                    <h2 id="controls-title">Personaliza el objeto</h2>
+                </div>
+            </div>
+
+            <fieldset class="color-picker">
+                <legend>Color del producto</legend>
+                <div class="color-picker__options">
+                    <button class="color-swatch is-selected" type="button" data-color="#2A75FF"
+                            aria-label="Azul" aria-pressed="true"></button>
+                    <button class="color-swatch" type="button" data-color="#2AFF6B"
+                            aria-label="Verde" aria-pressed="false"></button>
+                    <button class="color-swatch" type="button" data-color="#FF2AEE"
+                            aria-label="Rosa" aria-pressed="false"></button>
+                    <button class="color-swatch" type="button" data-color="#FFCC00"
+                            aria-label="Amarillo" aria-pressed="false"></button>
+                </div>
+            </fieldset>
+
+            <label class="range-control" for="scale-control">
+                <span>Escala <output id="scale-value" for="scale-control">1.0×</output></span>
+                <input id="scale-control" type="range" min="0.6" max="1.6" step="0.1" value="1">
+            </label>
+
+            <label class="range-control" for="rotation-control">
+                <span>Rotación <output id="rotation-value" for="rotation-control">25°</output></span>
+                <input id="rotation-control" type="range" min="0" max="360" step="5" value="25">
+            </label>
+
+            <label class="toggle-control" for="spin-control">
+                <span>
+                    <strong>Giro automático</strong>
+                    <small>Anima el producto continuamente</small>
+                </span>
+                <input id="spin-control" type="checkbox">
+                <span class="toggle-control__switch" aria-hidden="true"></span>
+            </label>
+
+            <p id="interaction-status" class="controls__status" role="status">Objeto listo para interactuar</p>
+        </section>
+    </main>
+
+    <script src="js/ar-experiencia.js"></script>
+</body>
+</html>
