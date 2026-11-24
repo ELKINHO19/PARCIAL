@@ -811,6 +811,10 @@ class WinterForest {
         this.enemies.splice(this.enemies.indexOf(yeti), 1);
         this.kills += 1;
         killCountElement.textContent = String(this.kills);
+        window.GameStorage.saveScore('winter', {
+            wave: this.wave,
+            kills: this.kills
+        });
         this.updateHud();
         if (this.enemies.length === 0 && !this.transitioning) {
             this.transitioning = true;
@@ -1164,6 +1168,7 @@ class WinterForestGame {
     bindControls() {
         document.addEventListener('keydown', (event) => {
             if (event.repeat || !this.alive || this.suplex) return;
+            if (this.started) window.GameStorage.track('winter', `tecla_${event.code}`);
             if (this.grapple && event.code !== 'Escape') return;
             if (event.code === 'Digit1') this.equipWeapon('gun');
             if (event.code === 'Digit2' && this.player.hasUzi) this.equipWeapon('uzi');
@@ -1180,6 +1185,7 @@ class WinterForestGame {
         canvas.addEventListener('mousedown', (event) => {
             if (document.pointerLockElement !== canvas || !this.alive || this.suplex) return;
             event.preventDefault();
+            window.GameStorage.track('winter', event.button === 0 ? 'clic_izquierdo' : 'clic_derecho');
             if (this.grapple) {
                 if (event.button === 0) this.grappleClick();
                 return;
@@ -1712,6 +1718,10 @@ class WinterForestGame {
 
     showGameOver() {
         this.gameOver = true;
+        window.GameStorage.finish('winter', {
+            wave: this.forest.wave,
+            kills: this.forest.kills
+        });
         if (document.pointerLockElement === canvas) document.exitPointerLock();
         overlayBadge.textContent = `Llegaste a la oleada ${this.forest.wave}`;
         overlayTitle.textContent = 'Has muerto';
@@ -1733,6 +1743,7 @@ class WinterForestGame {
         try {
             await canvas.requestPointerLock();
             gameError.hidden = true;
+            if (!this.started) window.GameStorage.begin('winter');
             this.started = true;
             overlayBadge.textContent = `Supervivencia · Oleada ${this.forest.wave}`;
             overlayTitle.textContent = 'Bosque invernal';

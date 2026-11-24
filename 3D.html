@@ -13,7 +13,7 @@
         body {
             min-height: 100vh;
             overflow: hidden;
-            background: #111d2a;
+            background: var(--bg-body);
         }
 
         .game-navbar {
@@ -215,7 +215,7 @@
         }
     </style>
 </head>
-<body>
+<body data-game-id="winter">
     <nav class="navbar navbar-expand game-navbar navbar-dark">
         <div class="container-fluid px-3 px-md-4">
             <a class="navbar-brand" href="index.html">MMA SCOUTING <span class="text-accent">UFC</span></a>
@@ -254,6 +254,11 @@
                 <h1 id="overlay-title">Bosque <span class="text-accent">invernal</span></h1>
                 <p id="overlay-description">Sobrevive en primera persona. La cámara pasará a tercera persona al morir.</p>
                 <div class="game-hint">W A S D moverte · Espacio saltar · Ratón mirar<br>Clic izq. atacar/disparar · Clic der. apuntar · 1/2/3 arma · R recargar · G granada · P bailar/cancelar</div>
+                <section class="local-scoreboard" aria-label="Marcador local">
+                    <h2>Marcador local</h2>
+                    <p class="game-local-summary" data-game-summary="winter">Récord e interacciones guardados localmente.</p>
+                    <ol class="local-score-history" data-score-history="winter" aria-label="Últimos resultados"></ol>
+                </section>
                 <button class="btn btn-accent btn-lg" id="start-button" type="button">Entrar al bosque</button>
                 <p class="game-error" id="game-error" role="status" hidden></p>
             </div>
@@ -261,6 +266,7 @@
         <div class="game-footer">WASD mover · Espacio saltar · 1/2/3 arma · R recargar · G granada · P bailar</div>
     </main>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/game-tools.js"></script>
     <script type="module" src="js/winter-game.js"></script>
 </body>
 </html>

@@ -194,7 +194,10 @@
             document.getElementById("back-to-welcome").addEventListener("click", () => this.showScreen("welcome-screen"));
             document.getElementById("character-grid").addEventListener("click", event => {
                 const card = event.target.closest("[data-character]");
-                if (card) this.toggleCharacter(Number(card.dataset.character));
+                if (card) {
+                    window.GameStorage.track("football", "seleccion_personaje");
+                    this.toggleCharacter(Number(card.dataset.character));
+                }
             });
             document.querySelectorAll(".mode-option").forEach(button => {
                 button.addEventListener("click", () => this.setMode(button.dataset.mode));
@@ -223,6 +226,7 @@
             document.querySelectorAll("[data-touch-direction]").forEach(button => {
                 button.addEventListener("pointerdown", event => {
                     event.preventDefault();
+                    window.GameStorage.track("football", "control_tactil_movimiento");
                     button.setPointerCapture(event.pointerId);
                     this.touchDirections.add(button.dataset.touchDirection);
                     button.classList.add("is-pressed");
@@ -243,6 +247,7 @@
                 const action = button.dataset.touchAction;
                 button.addEventListener("pointerdown", event => {
                     event.preventDefault();
+                    window.GameStorage.track("football", `control_tactil_${action}`);
                     button.setPointerCapture(event.pointerId);
                     button.classList.add("is-pressed");
                     this.activateTouchAction(action);
@@ -378,6 +383,8 @@
         }
 
         startMatch() {
+            window.GameStorage.begin("football");
+            window.GameStorage.track("football", `modo_${this.mode}`);
             this.sound.unlock();
             this.sound.playTrack("match");
             this.score = [0, 0];
@@ -432,8 +439,10 @@
 
         handleKeyDown(event) {
             const key = event.key.toLowerCase();
+            if (!event.repeat && this.state === "playing") window.GameStorage.track("football", `tecla_${key}`);
             if (["arrowup", "arrowdown", "arrowleft", "arrowright", " "].includes(key)) event.preventDefault();
             if (key === "escape" && this.mode === "training" && this.state === "playing") {
+                window.GameStorage.finish("football");
                 this.sound.stop();
                 this.showScreen("welcome-screen");
                 return;
@@ -1394,6 +1403,10 @@
             this.ball.vy = 0;
             document.getElementById("score-blue").textContent = this.score[0];
             document.getElementById("score-red").textContent = this.score[1];
+            window.GameStorage.saveScore("football", {
+                blueGoals: this.score[0],
+                redGoals: this.score[1]
+            });
             document.getElementById("celebration-label").textContent = celebrations[this.celebration].toUpperCase();
             document.getElementById("goal-caption").textContent = team === 0 ? "¡El equipo azul toma la delantera!" : "¡El equipo rojo responde con fuerza!";
             document.getElementById("goal-screen").hidden = false;
@@ -1428,6 +1441,11 @@
 
         endMatch() {
             this.state = "finished";
+            window.GameStorage.finish("football", {
+                blueGoals: this.score[0],
+                redGoals: this.score[1],
+                wins: this.score[0] > this.score[1] ? 1 : 0
+            });
             this.sound.stop();
             document.getElementById("football-scoreboard").classList.remove("training-mode");
             document.getElementById("football-scoreboard").hidden = true;

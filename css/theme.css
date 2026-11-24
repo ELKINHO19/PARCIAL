@@ -1,0 +1,31 @@
+.theme-toggle--floating {
+    position: fixed;
+    z-index: 10000;
+    top: 16px;
+    right: 16px;
+    padding: 9px 13px;
+    border: 1px solid #536273;
+    border-radius: 8px;
+    background: #121721;
+    color: #f5f7fa;
+    font: 700 0.8rem Inter, "Segoe UI", sans-serif;
+    cursor: pointer;
+}
+
+.theme-toggle--floating:hover,
+.theme-toggle--floating:focus-visible {
+    border-color: #39ff14;
+    color: #39ff14;
+}
+
+html[data-theme="light"] .theme-toggle--floating {
+    border-color: #aab8c7;
+    background: #fff;
+    color: #17212b;
+}
+
+html[data-theme="light"] .theme-toggle--floating:hover,
+html[data-theme="light"] .theme-toggle--floating:focus-visible {
+    border-color: #17833b;
+    color: #116b30;
+}

@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="css/styles.css">
     <title>Pong - MMA Scouting UFC</title>
 </head>
-<body class="pong-page">
+<body class="pong-page" data-game-id="pong">
 
     <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
         <div class="container">
@@ -58,6 +58,8 @@
                                         <div class="stat-label">IA</div>
                                     </div>
                                 </div>
+                                <p class="game-local-summary text-center" data-game-summary="pong">Marcadores y actividad guardados localmente.</p>
+                                <ol class="local-score-history text-center list-unstyled" data-score-history="pong" aria-label="Últimos marcadores locales"></ol>
                                 <div class="game-frame">
                                     <canvas width="750" height="585" id="game"></canvas>
                                 </div>
@@ -76,6 +78,7 @@
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/game-tools.js"></script>
     <script>
     const canvas = document.getElementById('game');
     const context = canvas.getContext('2d');
@@ -103,10 +106,14 @@
     let puntajeIA = 0;
     const elMarcadorJugador = document.getElementById('marcadorJugador');
     const elMarcadorIA = document.getElementById('marcadorIA');
+    let ultimaMetricaMovimiento = 0;
 
     function actualizarMarcador() {
       elMarcadorJugador.textContent = puntajeJugador;
       elMarcadorIA.textContent = puntajeIA;
+      if (puntajeJugador > 0 || puntajeIA > 0) {
+        window.GameStorage.saveScore('pong', { playerScore: puntajeJugador, aiScore: puntajeIA });
+      }
     }
 
     // Umbral de ventaja a partir del cual la IA "manda" una bola gris de penalización
@@ -450,6 +457,10 @@
 
     // Controlar la raqueta del jugador (derecha) con la posición vertical del mouse
     canvas.addEventListener('mousemove', function(e) {
+      if (Date.now() - ultimaMetricaMovimiento >= 1000) {
+        window.GameStorage.track('pong', 'movimiento_mouse');
+        ultimaMetricaMovimiento = Date.now();
+      }
       const rect = canvas.getBoundingClientRect();
       const escalaY = canvas.height / rect.height;
       const mouseY = (e.clientY - rect.top) * escalaY;
@@ -465,6 +476,7 @@
     });
 
     // Iniciar el juego
+    window.GameStorage.begin('pong');
     actualizarMarcador();
     programarDistraccionIA();
     programarProximoEventoCaos();

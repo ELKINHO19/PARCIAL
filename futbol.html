@@ -11,7 +11,7 @@
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="css/futbol.css">
 </head>
-<body class="football-page">
+<body class="football-page" data-game-id="football">
     <nav class="navbar navbar-expand-lg navbar-dark football-navbar">
         <div class="container">
             <a class="navbar-brand" href="index.html">MMA SCOUTING <span class="text-accent">UFC</span></a>
@@ -55,6 +55,7 @@
                         <button class="btn btn-football-secondary" id="open-training">Entrenamiento</button>
                     </div>
                     <div class="welcome-footnote">WASD + J K L U I · ESPACIO CAMBIA JUGADOR · JUGADOR 2: FLECHAS + NUMPAD 1–5</div>
+                    <p class="game-local-summary" data-game-summary="football">Marcadores y actividad guardados localmente.</p>
                 </div>
             </div>
 
@@ -116,6 +117,11 @@
                     <span class="panel-eyebrow">FINAL DEL PARTIDO</span>
                     <h2 id="final-score">AZUL 0 — 0 ROJO</h2>
                     <p id="final-caption">La cancha ha hablado.</p>
+                    <section class="local-scoreboard" aria-labelledby="local-scoreboard-title">
+                        <h3 id="local-scoreboard-title">Marcador local</h3>
+                        <p class="game-local-summary" data-game-summary="football">Récord e interacciones guardados localmente.</p>
+                        <ol class="local-score-history" data-score-history="football" aria-label="Últimos marcadores guardados"></ol>
+                    </section>
                     <div class="welcome-actions">
                         <button class="btn btn-football-primary" id="play-again">Revancha</button>
                         <button class="btn btn-football-secondary" id="return-menu">Menú principal</button>
@@ -163,6 +169,7 @@
         <p class="football-disclaimer">Personajes y técnicas originales. El juego se dibuja en Canvas y funciona sin recursos gráficos externos.</p>
     </main>
 
+    <script src="js/game-tools.js"></script>
     <script src="js/football-game.js"></script>
 </body>
 </html>

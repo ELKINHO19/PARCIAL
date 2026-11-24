@@ -306,3 +306,57 @@ input {
     transition-duration: 0.01ms !important;
   }
 }
+
+html[data-theme="light"] {
+  color-scheme: light;
+  background: #eef3f8;
+  color: #17212b;
+}
+
+html[data-theme="light"] .experience {
+  background:
+    radial-gradient(ellipse at 50% 70%, rgba(52, 94, 128, 0.14), transparent 55%),
+    #eef3f8;
+}
+
+html[data-theme="light"] .heading a,
+html[data-theme="light"] .heading__hint {
+  color: #435363;
+}
+
+html[data-theme="light"] .heading__eyebrow,
+html[data-theme="light"] .controls__eyebrow,
+html[data-theme="light"] .heading h1 span,
+html[data-theme="light"] .range-control output {
+  color: #17833b;
+}
+
+html[data-theme="light"] .controls {
+  border-color: #cbd5e1;
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: 0 22px 70px rgba(29, 45, 62, 0.2);
+}
+
+html[data-theme="light"] .color-picker legend,
+html[data-theme="light"] .range-control > span,
+html[data-theme="light"] .toggle-control strong {
+  color: #263545;
+}
+
+html[data-theme="light"] .toggle-control small,
+html[data-theme="light"] .controls__status {
+  color: #637386;
+}
+
+html[data-theme="light"] .toggle-control {
+  border-color: #dbe3ec;
+}
+
+html[data-theme="light"] .range-control input {
+  accent-color: #17833b;
+}
+
+html[data-theme="light"] .color-swatch.is-selected {
+  border-color: #17212b;
+  box-shadow: 0 0 0 3px rgba(23, 33, 43, 0.16);
+}

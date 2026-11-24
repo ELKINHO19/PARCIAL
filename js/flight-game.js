@@ -533,6 +533,7 @@ function disposeAircraft(aircraft) {
 }
 
 function resetGame() {
+    window.GameStorage.begin('flight');
     clearObjects(enemies);
     for (const wreck of wrecks) disposeAircraft(wreck.mesh);
     clearObjects(wrecks);
@@ -586,6 +587,7 @@ function spawnExplosion(position, scale = 1) {
 function endGame(collided) {
     if (!game.active) return;
     game.active = false;
+    window.GameStorage.finish('flight', { kills: game.kills });
     spawnExplosion(player.position, 2.2);
     player.visible = false;
     keys.clear();
@@ -918,6 +920,7 @@ function updateBullets(delta) {
                     startEnemyCrash(enemy);
                     enemies.splice(enemyIndex, 1);
                     game.kills += 1;
+                    window.GameStorage.saveScore('flight', { kills: game.kills });
                 }
                 break;
             }
@@ -1021,6 +1024,7 @@ function animate() {
 }
 
 window.addEventListener('keydown', (event) => {
+    if (!event.repeat && game.active) window.GameStorage.track('flight', `tecla_${event.code}`);
     if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Space'].includes(event.code)) {
         event.preventDefault();
     }
@@ -1029,7 +1033,10 @@ window.addEventListener('keydown', (event) => {
 window.addEventListener('keyup', (event) => keys.delete(event.code));
 window.addEventListener('blur', () => keys.clear());
 canvas.addEventListener('pointerdown', (event) => {
-    if (event.button === 0 && game.active) keys.add('Space');
+    if (event.button === 0 && game.active) {
+        window.GameStorage.track('flight', 'disparo');
+        keys.add('Space');
+    }
 });
 window.addEventListener('pointerup', () => keys.delete('Space'));
 
