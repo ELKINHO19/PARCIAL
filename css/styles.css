@@ -457,6 +457,17 @@ p {
   aspect-ratio: 9 / 16;
 }
 
+.micromundo-frame {
+  display: block;
+  width: 100%;
+  height: 82vh;
+  min-height: 680px;
+  max-height: 960px;
+  background-color: var(--bg-elevated);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+}
+
 /* ==========================================================================
    Game Frame (testing.html)
    ========================================================================== */

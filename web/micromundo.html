@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>La Ceniza · Micro-mundo 3D</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Ruda:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+/* VOICE: sala de control industrial, sobria y cinematográfica
+   IDEA: la pared de monitores del escenario: el visor 3D es la pantalla principal
+   PICTURE: el micro-mundo animado ocupa la primera pantalla
+   COLOUR and TYPE: ceniza #141413, amarillo traje #E7C647, verde emblema #00C897; Ruda 800 + Ruda
+   LAYOUT: barra de título, visor a sangre, fichas de la tríada en tres columnas */
+:root{color-scheme:dark;--bg:#141413;--panel:#1d1d1b;--ink:#f1efe6;--mute:#a9a698;--amarillo:#E7C647;--verde:#00C897;--linea:#33322d}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 Ruda,system-ui,sans-serif;overflow-x:clip}
+header{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:8px 24px;padding:18px max(4vw,16px) 14px;border-bottom:1px solid var(--linea)}
+h1{margin:0;font-weight:800;font-size:clamp(26px,4vw,40px);line-height:1.05;letter-spacing:.01em;text-wrap:balance}
+header p{margin:0;color:var(--mute);font-size:15px}
+.visor{position:relative;height:min(72vh,760px);min-height:380px;background:#0c0c0b}
+.visor canvas{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none}
+.estado{position:absolute;left:16px;top:14px;display:flex;flex-wrap:wrap;gap:6px 14px;font-size:13px;color:var(--mute);background:rgba(12,12,11,.72);padding:6px 10px;border:1px solid var(--linea);pointer-events:none}
+.estado b{color:var(--ink);font-weight:600;font-variant-numeric:tabular-nums}
+.carga{position:absolute;inset:0;display:grid;place-items:center;color:var(--mute);font-size:15px}
+.mandos{position:absolute;right:14px;bottom:14px;display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end}
+button{font:600 15px Ruda,sans-serif;color:var(--ink);background:rgba(29,29,27,.9);border:1px solid #4a4943;min-height:44px;padding:0 16px;cursor:pointer}
+button:hover{border-color:var(--amarillo)}
+button:focus-visible{outline:2px solid var(--amarillo);outline-offset:2px}
+button[aria-pressed=true]{background:var(--amarillo);color:#141413;border-color:var(--amarillo)}
+.triada{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0;border-top:1px solid var(--linea)}
+.ficha{padding:clamp(20px,3vw,36px) max(3vw,16px);border-right:1px solid var(--linea);display:flex;flex-direction:column;gap:10px}
+.ficha:last-child{border-right:0}
+.rol{color:var(--mute);font-size:14px;margin:0}
+.ficha h2{margin:0;font-weight:800;font-size:clamp(22px,2.4vw,30px);line-height:1.1}
+.ficha p{margin:0;font-size:16px;color:#d8d5ca}
+.paleta{display:flex;flex-wrap:wrap;gap:6px 14px;margin:4px 0 0;padding:0;list-style:none;font-size:13px;color:var(--mute)}
+.paleta li{display:flex;align-items:center;gap:6px;white-space:nowrap}
+.paleta i{width:16px;height:16px;border-radius:50%;border:1px solid #55544d;display:inline-block}
+.ficha button{align-self:flex-start;margin-top:auto}
+.datos{display:flex;flex-wrap:wrap;gap:4px 16px;font-size:14px;color:var(--mute)}
+.datos b{color:var(--ink);font-weight:600}
+footer{padding:22px max(4vw,16px);border-top:1px solid var(--linea);color:var(--mute);font-size:14px;display:flex;flex-wrap:wrap;gap:6px 24px;justify-content:space-between}
+@media(max-width:820px){.triada{grid-template-columns:minmax(0,1fr)}.ficha{border-right:0;border-bottom:1px solid var(--linea)}.visor{height:62vh}}
+@media(prefers-reduced-motion:reduce){button{transition:none}}
+</style>
+<script type="importmap">
+{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"}}
+</script>
+</head>
+<body>
+<header>
+  <h1>La Ceniza · Micro-mundo 3D</h1>
+  <p>Tríada animada en tiempo real · Elkin Fabian Gelvez Vera</p>
+</header>
+
+<section class="visor" id="visor" aria-label="Escena 3D interactiva">
+  <canvas id="lienzo"></canvas>
+  <div class="carga" id="carga">Cargando el micro-mundo…</div>
+  <div class="estado" aria-live="polite">
+    <span>FPS <b id="fps">–</b></span>
+    <span>Triángulos <b id="tris">–</b></span>
+    <span>Draw calls <b id="dc">–</b></span>
+  </div>
+  <div class="mandos">
+    <button id="btnPlay" aria-pressed="true">Animación</button>
+    <button id="btnUcx" aria-pressed="false">Colisionadores UCX_</button>
+    <button id="btnVista">Vista general</button>
+  </div>
+</section>
+
+<section class="triada" id="triada"></section>
+
+<footer>
+  <span>Arrastra para girar · rueda o pellizco para acercar · botón derecho para desplazar</span>
+  <span>Escenario base: modelo de Sketchfab adaptado; terreno modular, rigs, horneado y montaje propios</span>
+</footer>
+
+<script type="module">
+{
+const PJ = [
+  {n:1, nombre:'Tim “#1” Douglas', rol:'El curioso estratega · La Ceniza', texto:'29 años. Líder del dúo de exploración: analítico, leal y demasiado curioso. Carga la lámpara que guía al equipo en la superficie.', prop:'Lámpara (mano izquierda)', alto:'1,80 m', colores:[['#E7C647','Traje'],['#C87D20','Visor'],['#445443','Guante'],['#B99238','Botas'],['#535B68','Número']]},
+  {n:2, nombre:'Dannii “#2” Miller', rol:'El carguero · Los Marcados', texto:'20 años. Fuerza bruta del dúo, noble y callado; ve a Tim como su hermano mayor. Lo acompaña un dron explorador junto a la cabeza.', prop:'Dron (junto a la cabeza)', alto:'1,70 m', colores:[['#FFFFFF','Traje'],['#D4D4D4','Costura'],['#C0C0C0','Casco'],['#777777','Visor'],['#7A7A7A','Guantes']]},
+  {n:3, nombre:'Lawrence “Atlas” Claude', rol:'El líder del sector · La élite', texto:'38 años. Metódico y frío, controla la vigilancia del sector. Empuña el control DOX con el que mantiene el orden.', prop:'Control DOX (mano derecha)', alto:'1,80 m', colores:[['#4A4A4A','Traje'],['#606060','Costura'],['#00C897','Emblemas'],['#2F4F4F','Guantes']]},
+];
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+document.getElementById('triada').innerHTML = PJ.map(p => `
+  <article class="ficha">
+    <p class="rol">${esc(p.rol)}</p>
+    <h2>${esc(p.nombre)}</h2>
+    <p>${esc(p.texto)}</p>
+    <div class="datos"><span>Altura <b>${esc(p.alto)}</b></span><span>Hero Prop <b>${esc(p.prop)}</b></span></div>
+    <ul class="paleta">${p.colores.map(([h,l]) => `<li><i style="background:${esc(h)}"></i>${esc(h)} ${esc(l)}</li>`).join('')}</ul>
+    <button data-enfocar="${p.n}">Enfocar personaje</button>
+  </article>`).join('');
+}
+</script>
+<script type="module">
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+// El modelo se sirve como asset de la página; en pruebas locales se usa el archivo junto a ella
+const MODELO = 'Micromundo_Triada.glb';
+const lienzo = document.getElementById('lienzo');
+const visor = document.getElementById('visor');
+const renderer = new THREE.WebGLRenderer({ canvas: lienzo, antialias: true, powerPreference: 'high-performance' });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.toneMapping = THREE.NeutralToneMapping;
+renderer.toneMappingExposure = 1.0;
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+
+const escena = new THREE.Scene();
+escena.background = new THREE.Color(0x0c0c0b);
+const camara = new THREE.PerspectiveCamera(45, 1, 0.05, 200);
+const controles = new OrbitControls(camara, lienzo);
+controles.enableDamping = true;
+controles.maxPolarAngle = Math.PI * 0.49;
+
+const relojes = [];
+let mezcladores = [];
+let reproducir = true;
+let colisionadores = [];
+let vistaInicial = null;
+
+function ajustar() {
+  const w = visor.clientWidth, h = visor.clientHeight;
+  renderer.setSize(w, h, false);
+  camara.aspect = w / h;
+  camara.updateProjectionMatrix();
+}
+const ro = new ResizeObserver(ajustar);
+ro.observe(visor);
+
+new THREE.TextureLoader().load('ambiente.jpg', tex => {
+  tex.mapping = THREE.EquirectangularReflectionMapping;
+  tex.colorSpace = THREE.SRGBColorSpace;
+  escena.environment = tex;
+  escena.background = tex;
+  escena.backgroundBlurriness = 0.35;
+  escena.backgroundIntensity = 0.5;
+  escena.environmentIntensity = 0.9;
+});
+
+new GLTFLoader().load(MODELO, gltf => {
+  const raiz = gltf.scene;
+  escena.add(raiz);
+  raiz.traverse(o => {
+    if (o.name.startsWith('UCX_')) {
+      o.visible = false;
+      if (o.material) { o.material = new THREE.MeshBasicMaterial({ color: 0x00C897, wireframe: true }); }
+      colisionadores.push(o);
+    }
+    if (o.isLight) { o.intensity *= 0.0025; o.castShadow = false; }
+  });
+  // Cada rig con su propio mezclador: los ciclos duran distinto y se repiten por separado
+  for (const clip of gltf.animations) {
+    const n = clip.name.match(/^P(\d)/)?.[1];
+    const rig = raiz.getObjectByName(`P${n}_Rig`) || raiz;
+    const m = new THREE.AnimationMixer(rig);
+    m.clipAction(clip).play();
+    mezcladores.push(m);
+  }
+  const camGltf = gltf.cameras[0];
+  if (camGltf) {
+    camGltf.updateWorldMatrix(true, false);
+    camara.position.setFromMatrixPosition(camGltf.matrixWorld);
+    const dir = new THREE.Vector3(0, 0, -1).applyQuaternion(new THREE.Quaternion().setFromRotationMatrix(camGltf.matrixWorld));
+    controles.target.copy(camara.position).addScaledVector(dir, 3.7);
+  } else {
+    camara.position.set(2.75, 2.0, 4.9);
+    controles.target.set(2.75, 0.95, 1.3);
+  }
+  vistaInicial = { pos: camara.position.clone(), obj: controles.target.clone() };
+  controles.update();
+  document.getElementById('carga').remove();
+  contarEscena();
+}, undefined, err => {
+  document.getElementById('carga').textContent = 'No se pudo cargar la escena.';
+  console.error(err);
+});
+
+let trisTotal = 0;
+function contarEscena() {
+  trisTotal = 0;
+  escena.traverse(o => {
+    if (o.isMesh && o.visible) {
+      const g = o.geometry;
+      trisTotal += (g.index ? g.index.count : g.attributes.position.count) / 3;
+    }
+  });
+  document.getElementById('tris').textContent = Math.round(trisTotal).toLocaleString('es-CO');
+}
+
+let animando = null;
+function volar(pos, obj) {
+  animando = { p0: camara.position.clone(), o0: controles.target.clone(), p1: pos, o1: obj, t: 0 };
+}
+
+// Posición de cada personaje sobre la plataforma (Blender X, -Y -> three X, Z)
+const PUNTOS = { 1: [1.45, 1.40], 2: [2.70, 1.20], 3: [4.10, 1.45] };
+function enfocar(n) {
+  const p = PUNTOS[n];
+  if (!p) return;
+  const obj = new THREE.Vector3(p[0], 1.0, p[1]);
+  const pos = obj.clone().add(new THREE.Vector3(0, 0.7, 2.0));
+  volar(pos, obj);
+}
+
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-enfocar]');
+  if (b) { enfocar(b.dataset.enfocar); visor.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+});
+document.getElementById('btnVista').addEventListener('click', () => { if (vistaInicial) volar(vistaInicial.pos.clone(), vistaInicial.obj.clone()); });
+document.getElementById('btnPlay').addEventListener('click', e => {
+  reproducir = !reproducir;
+  e.currentTarget.setAttribute('aria-pressed', String(reproducir));
+});
+document.getElementById('btnUcx').addEventListener('click', e => {
+  const on = e.currentTarget.getAttribute('aria-pressed') !== 'true';
+  e.currentTarget.setAttribute('aria-pressed', String(on));
+  colisionadores.forEach(o => { o.visible = on; });
+});
+
+const reloj = new THREE.Clock();
+let cuadros = 0, acumulado = 0;
+const fpsEl = document.getElementById('fps'), dcEl = document.getElementById('dc');
+renderer.setAnimationLoop(() => {
+  const dt = Math.min(reloj.getDelta(), 0.1);
+  if (reproducir) mezcladores.forEach(m => m.update(dt));
+  if (animando) {
+    animando.t = Math.min(1, animando.t + dt / 0.9);
+    const k = 1 - Math.pow(1 - animando.t, 3);
+    camara.position.lerpVectors(animando.p0, animando.p1, k);
+    controles.target.lerpVectors(animando.o0, animando.o1, k);
+    if (animando.t >= 1) animando = null;
+  }
+  controles.update();
+  renderer.render(escena, camara);
+  cuadros++; acumulado += dt;
+  if (acumulado >= 0.5) {
+    fpsEl.textContent = Math.round(cuadros / acumulado);
+    dcEl.textContent = renderer.info.render.calls;
+    cuadros = 0; acumulado = 0;
+  }
+});
+</script>
+</body>
+</html>
