@@ -4,17 +4,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#0b0e14">
-    <title>Experiencia AR interactiva</title>
+    <title>Showroom 3D interactivo - MMA Scouting UFC</title>
     <link rel="stylesheet" href="css/ar-experiencia.css">
     <link rel="stylesheet" href="css/theme.css">
     <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
 </head>
 <body>
-    <main class="experience">
-        <a-scene embedded class="experience__scene" cursor="rayOrigin: mouse">
+    <main class="experience" id="experience">
+        <a-scene
+            embedded
+            class="experience__scene"
+            cursor="rayOrigin: mouse"
+            renderer="alpha: true"
+            webxr="requiredFeatures: hit-test; optionalFeatures: dom-overlay; overlayElement: #experience; referenceSpaceType: local"
+            xr-mode-ui="XRMode: ar; enterAREnabled: false; enterVREnabled: false">
             <a-entity light="type: ambient; intensity: 1.1"></a-entity>
             <a-entity light="type: directional; intensity: 1.8" position="-2 4 3"></a-entity>
-            <a-plane rotation="-90 0 0" width="200" height="200" color="#111923"></a-plane>
+            <a-plane id="showroom-ground" rotation="-90 0 0" width="200" height="200" color="#111923"></a-plane>
             <a-box id="objeto-producto"
                    class="clickable"
                    position="-1.7 1.2 -3"
@@ -25,20 +31,28 @@
                 <a-text value="NEXUS" align="center" color="#ffffff" width="2.2"
                         position="0 0 0.51"></a-text>
             </a-box>
+            <a-ring id="ar-reticle"
+                    position="0 0 -1"
+                    rotation="-90 0 0"
+                    radius-inner="0.08"
+                    radius-outer="0.11"
+                    material="color: #39ff14; shader: flat; opacity: 0.9"
+                    visible="false"></a-ring>
 
             <a-camera position="0 1.6 0">
                 <a-cursor id="cursor-ar"
                           color="#39ff14"
-                          fuse="false"
+                          fuse="true"
+                          fuse-timeout="900"
                           raycaster="objects: .clickable"></a-cursor>
             </a-camera>
         </a-scene>
 
         <header class="heading">
-            <a class="heading__back" href="ar-showroom.html">← Volver al showroom</a>
-            <p class="heading__eyebrow">Laboratorio interactivo</p>
-            <h1>Experiencia <span>AR</span></h1>
-            <p class="heading__hint">Haz clic o apunta al producto para cambiar su color.</p>
+            <a class="heading__back" href="index.html">← Volver al panel principal</a>
+            <p class="heading__eyebrow">Experiencia WebAR · A-Frame</p>
+            <h1>Showroom <span>3D</span></h1>
+            <p class="heading__hint">Interactúa con el producto usando el cursor virtual y los controles.</p>
         </header>
 
         <section class="controls" aria-labelledby="controls-title">
@@ -49,6 +63,11 @@
                     <h2 id="controls-title">Personaliza el objeto</h2>
                 </div>
             </div>
+
+            <button id="enter-ar" class="ar-launch-button" type="button" disabled>
+                Comprobando compatibilidad AR…
+            </button>
+            <p class="ar-help">En un móvil compatible, entra en AR, apunta a una superficie y toca para colocar el producto. En escritorio puedes explorar el showroom 3D.</p>
 
             <fieldset class="color-picker">
                 <legend>Color del producto</legend>

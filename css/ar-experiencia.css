@@ -130,6 +130,38 @@ input {
   font-size: 1.15rem;
 }
 
+.ar-launch-button {
+  width: 100%;
+  min-height: 46px;
+  margin-bottom: 10px;
+  border: 1px solid #39ff14;
+  border-radius: 9px;
+  background: #39ff14;
+  color: #07120a;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.ar-launch-button:hover:not(:disabled),
+.ar-launch-button:focus-visible {
+  background: #70ff55;
+  box-shadow: 0 0 18px rgba(57, 255, 20, 0.3);
+}
+
+.ar-launch-button:disabled {
+  border-color: #46505c;
+  background: #2a323d;
+  color: #a7b0bd;
+  cursor: not-allowed;
+}
+
+.ar-help {
+  margin: 0 0 22px;
+  color: #a7b0bd;
+  font-size: 0.75rem;
+  line-height: 1.5;
+}
+
 .color-picker {
   margin: 0 0 22px;
   padding: 0;
@@ -346,6 +378,16 @@ html[data-theme="light"] .toggle-control strong {
 html[data-theme="light"] .toggle-control small,
 html[data-theme="light"] .controls__status {
   color: #637386;
+}
+
+html[data-theme="light"] .ar-help {
+  color: #637386;
+}
+
+html[data-theme="light"] .ar-launch-button:disabled {
+  border-color: #cbd5e1;
+  background: #e2e8f0;
+  color: #526174;
 }
 
 html[data-theme="light"] .toggle-control {

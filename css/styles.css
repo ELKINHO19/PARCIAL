@@ -601,6 +601,27 @@ p {
   color: var(--accent);
 }
 
+@media (max-width: 575.98px) {
+  .navbar #theme-toggle {
+    display: inline-grid;
+    width: 40px;
+    height: 38px;
+    min-width: 40px;
+    padding: 0;
+    place-items: center;
+    font-size: 0;
+  }
+
+  .navbar #theme-toggle::before {
+    content: "☀️";
+    font-size: 0.9rem;
+  }
+
+  body[data-theme="light"] .navbar #theme-toggle::before {
+    content: "🌙";
+  }
+}
+
 .game-local-summary {
   margin: 0.75rem 0;
   color: var(--text-secondary);
